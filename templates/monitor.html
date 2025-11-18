@@ -7,12 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Para um "scroll" mais suave na lista de eventos */
         html {
             scroll-behavior: smooth;
         }
         body {
-            font-family: 'Inter', sans-serif; /* Uma fonte mais parecida com a do Figma */
+            font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
@@ -71,15 +70,13 @@
     </div>
 
      <div id="profile-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
-        <!-- Overlay para fechar o modal -->
         <div id="modal-overlay" class="absolute inset-0"></div>
         
-        <!-- Conteúdo do Modal -->
         <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm z-10">
             <h3 class="text-2xl font-semibold text-gray-800 text-center">Próximos Passos</h3>
             <p class="text-gray-600 text-center mt-4">Esta funcionalidade de perfil ainda está em desenvolvimento.</p>
             <div class="mt-6 text-center">
-                <button id="close-modal-button" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                <button id="close-modal-button" class="px-6 py-2 bg-[#e16161] text-white rounded-lg hover:bg-[#d55c5c]">
                     Entendido
                 </button>
             </div>
@@ -87,8 +84,7 @@
     </div>
 
     <script>
-        // --- Constantes ---
-        const API_URL = '/api/eventos'; // Endpoint do Flask
+        const API_URL = '/api/eventos';
         const eventsFeed = document.getElementById('events-feed');
         const feedPlaceholder = document.getElementById('feed-placeholder');
         const noEventsMessage = `
@@ -100,9 +96,6 @@
                 <p class="mt-1 text-sm text-gray-500">Ainda não há alertas registrados.</p>
             </div>`;
 
-        // --- Funções Auxiliares ---
-
-        // Formata o timestamp (segundos) para uma string legível
         function formatTimestamp(timestamp) {
             const date = new Date(timestamp * 1000); 
             return date.toLocaleString('pt-BR', { 
@@ -114,7 +107,6 @@
             });
         }
 
-        // Converte o tipo de evento (do ESP32) para um texto amigável
         function formatEventType(type) {
             if (type === 'queda') {
                 return 'Queda Grave Detectada';
@@ -125,7 +117,6 @@
             return 'Evento Desconhecido';
         }
 
-        // Retorna as classes de estilização do card com base no tipo
         function getCardStyles(type) {
             if (type === 'queda') {
                 return {
@@ -145,31 +136,24 @@
                     borderColor: 'border-yellow-500'
                 };
             }
-            // Padrão
             return { icon: '', bgColor: 'bg-gray-500', borderColor: 'border-gray-500' };
         }
 
-        // --- Função Principal de Renderização ---
         function renderEvents(events) {
-            // Limpa o feed
             eventsFeed.innerHTML = ''; 
             
-            // Verifica se há eventos
             if (events.length === 0) {
                  eventsFeed.innerHTML = noEventsMessage;
                  return;
             }
 
-            // Reverte para mostrar os mais recentes primeiro
             events.reverse();
 
-            // Cria um card para cada evento
             events.forEach(event => {
                 const eventData = event.data;
                 const eventKey = event.key;
                 const styles = getCardStyles(eventData.tipo);
 
-                // O link do Google Maps
                 const mapsLink = `https://www.google.com/maps/search/?api=1&query=${eventData.lat},${eventData.lon}`;
 
                 const cardHTML = `
@@ -202,14 +186,11 @@
                 </div>
                 `;
                 
-                // Adiciona o novo card ao feed
                 eventsFeed.innerHTML += cardHTML;
             });
         }
 
-        // --- Lógica de Execução ---
         async function fetchEvents() {
-            // Mostra o placeholder de "carregando" apenas na primeira vez
             if (feedPlaceholder) {
                 feedPlaceholder.style.display = 'block';
             }
@@ -224,24 +205,21 @@
                 if (result && result.eventos) {
                     renderEvents(result.eventos);
                 } else {
-                    renderEvents([]); // Renderiza a mensagem de "Nenhum evento"
+                    renderEvents([]);
                 }
             } catch (error) {
                 console.error("Erro ao buscar eventos:", error);
                 eventsFeed.innerHTML = `<div class="text-center py-10 text-red-600">Erro ao carregar dados do servidor.</div>`;
             } finally {
-                // Esconde o placeholder de "carregando"
                 if (feedPlaceholder) {
                     feedPlaceholder.style.display = 'none';
                 }
             }
         }
 
-        // 1. Executa a função imediatamente ao carregar a página
         fetchEvents();
 
-        // 2. Define o intervalo de atualização (Polling) a cada 5 segundos
-        setInterval(fetchEvents, 5000); // Aumentei para 5s para ser mais gentil com o servidor
+        setInterval(fetchEvents, 5000);
 
           const profileButton = document.getElementById('profile-button');
         const profileModal = document.getElementById('profile-modal');
@@ -256,10 +234,9 @@
             profileModal.classList.add('hidden');
         };
 
-        // Eventos
         if (profileButton) {
             profileButton.addEventListener('click', (e) => {
-                e.preventDefault(); // Impede que o link '#' mude o URL
+                e.preventDefault();
                 openModal();
             });
         }
