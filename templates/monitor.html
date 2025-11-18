@@ -28,7 +28,7 @@
                 <span class="text-xs font-medium mt-1">Home</span>
             </a>
             
-            <a href="#" class="flex flex-col items-center justify-center p-4 text-gray-500 hover:text-purple-600 mx-2 md:mx-auto md:my-2">
+            <a href="#" id="profile-button" class="flex flex-col items-center justify-center p-4 text-gray-500 hover:text-purple-600 mx-2 md:mx-auto md:my-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                 </svg>
@@ -70,6 +70,21 @@
         </main>
     </div>
 
+     <div id="profile-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <!-- Overlay para fechar o modal -->
+        <div id="modal-overlay" class="absolute inset-0"></div>
+        
+        <!-- Conteúdo do Modal -->
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm z-10">
+            <h3 class="text-2xl font-semibold text-gray-800 text-center">Próximos Passos</h3>
+            <p class="text-gray-600 text-center mt-4">Esta funcionalidade de perfil ainda está em desenvolvimento.</p>
+            <div class="mt-6 text-center">
+                <button id="close-modal-button" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // --- Constantes ---
@@ -227,6 +242,35 @@
 
         // 2. Define o intervalo de atualização (Polling) a cada 5 segundos
         setInterval(fetchEvents, 5000); // Aumentei para 5s para ser mais gentil com o servidor
+
+          const profileButton = document.getElementById('profile-button');
+        const profileModal = document.getElementById('profile-modal');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const modalOverlay = document.getElementById('modal-overlay');
+
+        const openModal = () => {
+            profileModal.classList.remove('hidden');
+        };
+
+        const closeModal = () => {
+            profileModal.classList.add('hidden');
+        };
+
+        // Eventos
+        if (profileButton) {
+            profileButton.addEventListener('click', (e) => {
+                e.preventDefault(); // Impede que o link '#' mude o URL
+                openModal();
+            });
+        }
+        
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', closeModal);
+        }
+        
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', closeModal);
+        }
     </script>
 
 </body>
