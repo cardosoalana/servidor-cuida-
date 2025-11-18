@@ -61,7 +61,6 @@ class BinarySearchTree:
 
 app = Flask(__name__)
 
-# --- CONFIGURAÇÃO DO BANCO DE DADOS ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -71,14 +70,9 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-# --- FIM DA CONFIGURAÇÃO DO DB ---
 
-
-# Instância global da ABB (Nosso "cache" em memória)
 FALL_DATA_TREE = BinarySearchTree() 
 
-
-# --- MODELO DA TABELA DO BANCO DE DADOS ---
 class Evento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.BigInteger, nullable=False, index=True)
@@ -121,7 +115,6 @@ def report_event():
             "acel": aceleracao
         }
 
-        # 1. Armazenamento no Banco de Dados
         novo_evento_db = Evento(
             timestamp=timestamp_key,
             tipo=event_type,
@@ -132,16 +125,15 @@ def report_event():
         db.session.add(novo_evento_db)
         db.session.commit()
         
-        # 2. Armazenamento na Árvore Binária (Cache)
         FALL_DATA_TREE.insert(timestamp_key, payload)
         
-        print(f"✅ Evento armazenado (DB e ABB): Tipo={event_type}, Chave={timestamp_key}")
+        print(f"Evento armazenado (DB e ABB): Tipo={event_type}, Chave={timestamp_key}")
         
         return jsonify({"status": "sucesso", "chave_registro": timestamp_key}), 200
 
     except Exception as e:
         db.session.rollback() 
-        print(f"❌ Erro ao processar requisição: {e}")
+        print(f"Erro ao processar requisição: {e}")
         return jsonify({"status": "erro", "mensagem": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/api/eventos', methods=['GET'])
@@ -157,7 +149,6 @@ def get_events():
 @app.route('/dados')
 def pagina_dados():
     """Serve a nova página HTML de análise de dados."""
-    # O 'return' PRECISA estar indentado aqui dentro
     return render_template('dados.html')
 
 @app.route('/api/analise_de_risco', methods=['GET'])
@@ -168,25 +159,20 @@ def analise_de_risco():
     """
     print("Iniciando análise de risco algorítmica...")
     try:
-        # Fuso horário do Brasil (ex: São Paulo)
         fuso_horario_br = pytz.timezone('America/Sao_Paulo')
         
-        # Define o período "noturno" (22h - 6h)
         HORA_INICIO_NOITE = 22
         HORA_FIM_NOITE = 6
         
-        # Define o período "recente" (últimos 7 dias)
         agora = datetime.now(fuso_horario_br)
         uma_semana_atras = agora - timedelta(days=7)
         timestamp_uma_semana_atras = int(uma_semana_atras.timestamp())
 
-        # 1. Pega TODOS os eventos do Banco de Dados
         eventos_do_db = Evento.query.all()
         
         if not eventos_do_db:
             return jsonify({"alertas": ["Não há dados suficientes para análise."]})
 
-        # 2. Inicia nosso "motor" de regras
         total_eventos = len(eventos_do_db)
         eventos_noturnos = 0
         eventos_recentes = 0
@@ -194,27 +180,21 @@ def analise_de_risco():
         total_panicos = 0
 
         for evento in eventos_do_db:
-            # Converte o timestamp salvo (que é UTC/Epoch) para o fuso do Brasil
             ts_evento = datetime.fromtimestamp(evento.timestamp, fuso_horario_br)
             
-            # REGRA 1: Checa se é noturno (entre 22h e 6h)
             if ts_evento.hour >= HORA_INICIO_NOITE or ts_evento.hour < HORA_FIM_NOITE:
                 eventos_noturnos += 1
             
-            # REGRA 2: Checa se é recente (últimos 7 dias)
             if evento.timestamp >= timestamp_uma_semana_atras:
                 eventos_recentes += 1
             
-            # Contagem simples
             if evento.tipo == 'queda':
                 total_quedas += 1
             elif evento.tipo == 'panico':
                 total_panicos += 1
 
-        # 3. Gera as "previsões" (análises) com base nas regras
         lista_de_alertas = []
 
-        # Análise 1: Eventos Noturnos
         if eventos_noturnos > 0:
             alerta = (
                 f"Detectamos {eventos_noturnos} evento(s) "
@@ -223,7 +203,6 @@ def analise_de_risco():
             )
             lista_de_alertas.append({"nivel": "alto", "texto": alerta})
         
-        # Análise 2: Frequência
         if eventos_recentes > 2:
             alerta = (
                 f"A frequência de eventos aumentou, "
@@ -238,7 +217,6 @@ def analise_de_risco():
             )
             lista_de_alertas.append({"nivel": "info", "texto": alerta})
 
-        # Análise 3: Tipo de Evento
         if total_quedas > total_panicos and total_quedas > 0:
             alerta = (
                 f"O paciente registrou mais quedas ({total_quedas}) "
@@ -247,7 +225,6 @@ def analise_de_risco():
             )
             lista_de_alertas.append({"nivel": "info", "texto": alerta})
 
-        # Análise 4: Sem alertas
         if not lista_de_alertas:
             lista_de_alertas.append({
                 "nivel": "info", 
@@ -258,7 +235,7 @@ def analise_de_risco():
         return jsonify(alertas=lista_de_alertas)
 
     except Exception as e:
-        print(f"❌ Erro na análise de risco: {e}")
+        print(f"Erro na análise de risco: {e}")
         return jsonify({"erro": str(e)}), 500
 
 # ------------------------------------------------------------------
@@ -281,10 +258,10 @@ def carregar_db_para_abb():
             payload = {"tipo": evento.tipo, "lat": evento.lat, "lon": evento.lon, "acel": evento.acel}
             FALL_DATA_TREE.insert(evento.timestamp, payload)
             
-        print(f"✅ {len(eventos_do_db)} eventos carregados do DB para a memória.")
+        print(f"{len(eventos_do_db)} eventos carregados do DB para a memória.")
     
     except Exception as e:
-        print(f"❌ Erro ao carregar dados do DB: {e}")
+        print(f"Erro ao carregar dados do DB: {e}")
         print("Continuando com a árvore vazia...")
     
     print("-----------------------------------------------------")

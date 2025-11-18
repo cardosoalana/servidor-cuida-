@@ -73,7 +73,6 @@
 
 
     <script>
-        // --- LÓGICA DO MODAL DE PERFIL (Intocada) ---
         const profileButton = document.getElementById('profile-button');
         const profileModal = document.getElementById('profile-modal');
         const closeModalButton = document.getElementById('close-modal-button');
@@ -94,13 +93,9 @@
         if (modalOverlay) { modalOverlay.addEventListener('click', closeModal); }
 
 
-        // --- LÓGICA DA PÁGINA DE ANÁLISE (MODIFICADA) ---
         const analysisFeed = document.getElementById('analysis-feed');
         const feedPlaceholder = document.getElementById('feed-placeholder');
 
-        /**
-         * NOVO: Esta função cria os "Cards Maiores"
-         */
         function getAlertCard(alerta) {
             let styles = {
                 borderColor: 'border-blue-500',
@@ -125,7 +120,6 @@
                 };
             }
 
-            // Este é o novo HTML do Card
             return `
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden border-l-8 ${styles.borderColor}">
                     <div class="flex items-center p-5">
@@ -141,13 +135,10 @@
             `;
         }
 
-        /**
-         * MODIFICADO: Esta função agora remove a lógica do botão
-         */
+
         async function fetchAnalysis() {
-            // 1. Mostra o "Carregando..."
-            analysisFeed.innerHTML = ''; // Limpa os resultados antigos
-            feedPlaceholder.style.display = 'block'; // Mostra o spinner
+            analysisFeed.innerHTML = '';
+            feedPlaceholder.style.display = 'block';
 
             try {
                 const response = await fetch('/api/analise_de_risco');
@@ -160,7 +151,6 @@
                     throw new Error(data.erro);
                 }
 
-                // 2. Renderiza os resultados
                 if (data.alertas && data.alertas.length > 0) {
                     data.alertas.forEach(alerta => {
                         analysisFeed.innerHTML += getAlertCard(alerta);
@@ -174,13 +164,10 @@
                 analysisFeed.innerHTML = getAlertCard({nivel: 'alto', texto: `Falha ao conectar ao algoritmo de análise: ${error.message}`});
             
             } finally {
-                // 3. Esconde o "Carregando..."
                 feedPlaceholder.style.display = 'none';
             }
         }
 
-        // --- PONTO DE PARTIDA (MODIFICADO) ---
-        // Chama a análise automaticamente ao carregar a página
         fetchAnalysis();
 
     </script>
