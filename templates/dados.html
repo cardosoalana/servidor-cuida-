@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuida+ | Relatórios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <nav class="md:w-24 bg-white shadow-lg flex md:flex-col justify-around md:justify-start md:py-8">
+            <a href="/" class="flex flex-col items-center justify-center p-4 text-gray-500 hover:text-purple-600 mx-2 md:mx-auto md:my-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+                <span class="text-xs font-medium mt-1">Home</span>
+            </a>
+            
+            <a href="#" id="profile-button" class="flex flex-col items-center justify-center p-4 text-gray-500 hover:text-purple-600 mx-2 md:mx-auto md:my-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-xs font-medium mt-1">Perfil</span>
+            </a>
+
+            <a href="/dados" class="flex flex-col items-center justify-center p-4 text-purple-600 bg-purple-100 rounded-lg mx-2 md:mx-auto md:my-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm3 2a1 1 0 00-1 1v1a1 1 0 102 0V6a1 1 0 00-1-1zM5 9a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zm3 1a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm3 1a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-3 3a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm3 1a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-xs font-medium mt-1">Dados</span>
+            </a>
+        </nav>
+
+        <main class="flex-1 p-4 md:p-8 lg:p-12 bg-gray-100 overflow-y-auto">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Relatórios</h2>
+                </div>
+
+            <div id="analysis-feed" class="space-y-6"> <div id="feed-placeholder" class="text-center py-10 text-gray-500">
+                    <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-sm font-medium text-gray-900">Processando Relatórios...</h3>
+                    <p class="mt-1 text-sm text-gray-500">Seu algoritmo está analisando os dados do paciente.</p>
+                </div>
+                
+                </div>
+        </main>
+    </div>
+
+    <div id="profile-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div id="modal-overlay" class="absolute inset-0"></div>
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm z-10">
+            <h3 class="text-2xl font-semibold text-gray-800 text-center">Próximos Passos</h3>
+            <p class="text-gray-600 text-center mt-4">Esta funcionalidade de perfil ainda está em desenvolvimento.</p>
+            <div class="mt-6 text-center">
+                <button id="close-modal-button" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- LÓGICA DO MODAL DE PERFIL (Intocada) ---
+        const profileButton = document.getElementById('profile-button');
+        const profileModal = document.getElementById('profile-modal');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const modalOverlay = document.getElementById('modal-overlay');
+
+        if (profileButton) {
+            profileButton.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                profileModal.classList.remove('hidden');
+            });
+        }
+        
+        const closeModal = () => {
+            profileModal.classList.add('hidden');
+        };
+        
+        if (closeModalButton) { closeModalButton.addEventListener('click', closeModal); }
+        if (modalOverlay) { modalOverlay.addEventListener('click', closeModal); }
+
+
+        // --- LÓGICA DA PÁGINA DE ANÁLISE (MODIFICADA) ---
+        const analysisFeed = document.getElementById('analysis-feed');
+        const feedPlaceholder = document.getElementById('feed-placeholder');
+
+        /**
+         * NOVO: Esta função cria os "Cards Maiores"
+         */
+        function getAlertCard(alerta) {
+            let styles = {
+                borderColor: 'border-blue-500',
+                textColor: 'text-blue-600',
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                title: 'Informativo'
+            };
+
+            if (alerta.nivel === 'alto') {
+                styles = {
+                    borderColor: 'border-red-500',
+                    textColor: 'text-red-600',
+                    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`,
+                    title: 'Risco Alto'
+                };
+            } else if (alerta.nivel === 'medio') {
+                styles = {
+                    borderColor: 'border-yellow-500',
+                    textColor: 'text-yellow-600',
+                    icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                    title: 'Risco Médio'
+                };
+            }
+
+            // Este é o novo HTML do Card
+            return `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden border-l-8 ${styles.borderColor}">
+                    <div class="flex items-center p-5">
+                        <div class="flex-shrink-0">
+                            ${styles.icon}
+                        </div>
+                        <div class="ml-5 flex-grow">
+                            <h3 class="text-lg font-bold ${styles.textColor}">${styles.title}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${alerta.texto}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * MODIFICADO: Esta função agora remove a lógica do botão
+         */
+        async function fetchAnalysis() {
+            // 1. Mostra o "Carregando..."
+            analysisFeed.innerHTML = ''; // Limpa os resultados antigos
+            feedPlaceholder.style.display = 'block'; // Mostra o spinner
+
+            try {
+                const response = await fetch('/api/analise_de_risco');
+                if (!response.ok) {
+                    throw new Error(`Erro no servidor: ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (data.erro) {
+                    throw new Error(data.erro);
+                }
+
+                // 2. Renderiza os resultados
+                if (data.alertas && data.alertas.length > 0) {
+                    data.alertas.forEach(alerta => {
+                        analysisFeed.innerHTML += getAlertCard(alerta);
+                    });
+                } else {
+                    analysisFeed.innerHTML = getAlertCard({ texto: 'Nenhuma análise pôde ser gerada.'});
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar análise:", error);
+                analysisFeed.innerHTML = getAlertCard({nivel: 'alto', texto: `Falha ao conectar ao algoritmo de análise: ${error.message}`});
+            
+            } finally {
+                // 3. Esconde o "Carregando..."
+                feedPlaceholder.style.display = 'none';
+            }
+        }
+
+        // --- PONTO DE PARTIDA (MODIFICADO) ---
+        // Chama a análise automaticamente ao carregar a página
+        fetchAnalysis();
+
+    </script>
+
+</body>
+</html>
